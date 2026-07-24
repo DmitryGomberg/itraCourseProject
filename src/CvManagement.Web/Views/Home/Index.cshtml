@@ -1,0 +1,103 @@
+@model CvManagement.Web.Models.Home.HomeIndexViewModel
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@{
+    ViewData["Title"] = Localizer["CV Management System"];
+}
+
+<h1 class="mb-4">@Localizer["CV Management System"]</h1>
+
+@if (User.Identity?.IsAuthenticated == true && User.IsInRole("Candidate"))
+{
+    <a asp-controller="BrowsePositions" asp-action="Index" class="btn btn-primary mb-4">@Localizer["Browse available positions"]</a>
+}
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h2 class="card-title">@Model.TotalCandidates</h2>
+                <p class="card-text text-muted">@Localizer["Candidates"]</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h2 class="card-title">@Model.TotalPositions</h2>
+                <p class="card-text text-muted">@Localizer["Positions"]</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h2 class="card-title">@Model.TotalPublishedCvs</h2>
+                <p class="card-text text-muted">@Localizer["Published CVs"]</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.LatestPositions.Any())
+{
+    var canManagePositions = User.IsInRole("Recruiter") || User.IsInRole("Administrator");
+    <div class="mb-4">
+        <h4>@Localizer["Latest Positions"]</h4>
+        <ul class="list-group">
+            @foreach (var pos in Model.LatestPositions)
+            {
+                if (canManagePositions)
+                {
+                    <a asp-controller="Positions" asp-action="Details" asp-route-id="@pos.Id"
+                       class="list-group-item list-group-item-action">@pos.Title</a>
+                }
+                else
+                {
+                    <span class="list-group-item">@pos.Title</span>
+                }
+            }
+        </ul>
+    </div>
+}
+
+@if (Model.TopPositions.Any())
+{
+    var canManagePositions = User.IsInRole("Recruiter") || User.IsInRole("Administrator");
+    <div class="mb-4">
+        <h4>@Localizer["Top Positions"]</h4>
+        <ul class="list-group">
+            @foreach (var pos in Model.TopPositions)
+            {
+                if (canManagePositions)
+                {
+                    <a asp-controller="Positions" asp-action="Details" asp-route-id="@pos.Id"
+                       class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        @pos.Title
+                        <span class="badge bg-primary rounded-pill">@pos.CvCount CVs</span>
+                    </a>
+                }
+                else
+                {
+                    <span class="list-group-item d-flex justify-content-between align-items-center">
+                        @pos.Title
+                        <span class="badge bg-primary rounded-pill">@pos.CvCount CVs</span>
+                    </span>
+                }
+            }
+        </ul>
+    </div>
+}
+
+@if (Model.TagCloud.Any())
+{
+    <div class="mb-4">
+        <h4>@Localizer["Popular Tags"]</h4>
+        <div class="d-flex flex-wrap gap-2">
+            @foreach (var tag in Model.TagCloud)
+            {
+                var fontSize = Math.Min(tag.UsageCount * 2, 20);
+                <span class="badge bg-secondary" style="font-size: calc(12px + @(fontSize)px);">@tag.Name</span>
+            }
+        </div>
+    </div>
+}

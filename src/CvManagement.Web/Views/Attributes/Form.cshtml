@@ -1,0 +1,100 @@
+@model CvManagement.Web.Models.Attributes.AttributeFormViewModel
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@{
+    var isEdit = Model.Id.HasValue;
+    ViewData["Title"] = isEdit ? Localizer["Edit Attribute"].Value : Localizer["Create Attribute"].Value;
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@Model.Id" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            @if (isEdit)
+            {
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="Version" />
+            }
+
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label"></label>
+                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Category" class="form-label"></label>
+                <select asp-for="Category" class="form-select"
+                        asp-items="Html.GetEnumSelectList<CvManagement.Domain.AttributeCategory>()"></select>
+                <span asp-validation-for="Category" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="DataType" class="form-label"></label>
+                <select asp-for="DataType" class="form-select" id="dataTypeSelect"
+                        asp-items="Html.GetEnumSelectList<CvManagement.Domain.AttributeDataType>()"></select>
+                <span asp-validation-for="DataType" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3" id="optionsContainer" style="display:none">
+                <label class="form-label">@Localizer["Options (one per line)"]</label>
+                <textarea class="form-control" id="optionsText" rows="5">@string.Join("\n", Model.Options)</textarea>
+                <span class="text-muted small">@Localizer["Enter each option on a separate line"]</span>
+            </div>
+            <div id="optionsHiddenInputs"></div>
+
+            <button type="submit" class="btn btn-primary">@Localizer["Save"]</button>
+            <a asp-action="Index" class="btn btn-secondary">@Localizer["Cancel"]</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const select = document.getElementById('dataTypeSelect');
+            const container = document.getElementById('optionsContainer');
+            const optionsText = document.getElementById('optionsText');
+            const hiddenContainer = document.getElementById('optionsHiddenInputs');
+            const OPTION_TYPE_VALUE = '@((int)CvManagement.Domain.AttributeDataType.Option)';
+
+            function toggleOptions() {
+                container.style.display = select.value === OPTION_TYPE_VALUE ? '' : 'none';
+            }
+
+            function syncHiddenInputs() {
+                hiddenContainer.innerHTML = '';
+                if (select.value !== OPTION_TYPE_VALUE) return;
+                const lines = optionsText.value
+                    .split('\n')
+                    .map(l => l.trim())
+                    .filter(l => l.length > 0);
+                for (const line of lines) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'Options';
+                    input.value = line;
+                    hiddenContainer.appendChild(input);
+                }
+            }
+
+            select.addEventListener('change', function () {
+                toggleOptions();
+                syncHiddenInputs();
+            });
+            optionsText.addEventListener('input', syncHiddenInputs);
+
+            toggleOptions();
+            syncHiddenInputs();
+        })();
+    </script>
+}

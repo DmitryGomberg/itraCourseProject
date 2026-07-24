@@ -1,0 +1,148 @@
+:root {
+    --bg-color: #ffffff;
+    --text-color: #212529;
+    --card-bg: #f8f9fa;
+    --border-color: #dee2e6;
+    --navbar-bg: #ffffff;
+}
+
+[data-theme="dark"] {
+    --bg-color: #1a1a1a;
+    --text-color: #e0e0e0;
+    --card-bg: #2a2a2a;
+    --border-color: #444444;
+    --navbar-bg: #212121;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.navbar {
+    background-color: var(--navbar-bg) !important;
+}
+
+.navbar-brand,
+.nav-link,
+.navbar-text {
+    color: var(--text-color) !important;
+}
+
+.navbar-toggler {
+    border-color: var(--border-color) !important;
+}
+
+.navbar-toggler-icon {
+    filter: var(--navbar-icon-filter, none);
+    display: inline-block;
+}
+
+.card, table, .table, .table > :not(caption) > * > *, .list-group-item {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.list-group-item {
+    border-color: var(--border-color) !important;
+}
+
+.list-group-item:hover {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.table {
+    --bs-table-bg: var(--card-bg);
+    --bs-table-color: var(--text-color);
+    --bs-table-border-color: var(--border-color);
+    --bs-table-striped-bg: var(--card-bg);
+    --bs-table-hover-bg: var(--card-bg);
+}
+
+input, textarea, select,
+.form-control, .form-select {
+    background-color: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+.form-select {
+    color-scheme: dark light;
+}
+
+[data-theme="dark"] {
+    --navbar-icon-filter: invert(1);
+}
+
+.btn-outline-secondary {
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+footer.footer, footer.footer .text-muted {
+    color: var(--text-color) !important;
+}
+
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+@media (max-width: 991px) {
+    .navbar-collapse {
+        padding-top: 0.5rem;
+    }
+
+    .navbar-nav {
+        gap: 0.25rem;
+    }
+
+    .navbar-nav .nav-item {
+        width: 100%;
+    }
+
+    table.table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .btn-toolbar, .d-flex.gap-2 {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 575px) {
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    .container {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+}
+
+.d-contents {
+    display: contents;
+}

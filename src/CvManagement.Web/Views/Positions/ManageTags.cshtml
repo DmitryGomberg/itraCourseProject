@@ -1,0 +1,107 @@
+@inject IViewLocalizer Localizer
+@model CvManagement.Web.Models.Positions.ManageTagsViewModel
+@{
+    ViewData["Title"] = Localizer["Tags"] + " — " + Model.PositionTitle;
+}
+
+<h2>@Localizer["Tags"] — @Model.PositionTitle</h2>
+
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<h4>@Localizer["Current Tags"]</h4>
+
+@if (Model.CurrentTags.Any())
+{
+    <form method="post" asp-action="RemoveTags" asp-route-id="@Model.PositionId" id="removeTagsForm">
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            @foreach (var tag in Model.CurrentTags)
+            {
+                <div class="form-check">
+                    <input class="form-check-input tag-checkbox" type="checkbox" value="@tag.Id" id="tag-@tag.Id" />
+                    <label class="form-check-label badge bg-secondary" for="tag-@tag.Id">@tag.Name</label>
+                </div>
+            }
+        </div>
+        <button type="submit" class="btn btn-danger btn-sm d-none" id="btnRemoveTags">@Localizer["Remove Selected"]</button>
+    </form>
+}
+else
+{
+    <p class="text-muted">@Localizer["No tags assigned."]</p>
+}
+
+<hr />
+
+<h4>@Localizer["Add Tag"]</h4>
+<form method="post" asp-action="AddTags" asp-route-id="@Model.PositionId" class="row g-3 align-items-end">
+    <div class="col-md-6">
+        <label class="form-label">@Localizer["Tag Name (new or existing)"]</label>
+        <input type="text" name="TagName" id="tagNameInput" class="form-control" list="tagSuggestions" placeholder="Type to search or create..." autocomplete="off" />
+        <datalist id="tagSuggestions"></datalist>
+    </div>
+    <div class="col-md-3">
+        <button type="submit" class="btn btn-primary">@Localizer["Add Tag"]</button>
+    </div>
+</form>
+
+<div class="mt-4">
+    <a asp-action="Details" asp-route-id="@Model.PositionId" class="btn btn-secondary">@Localizer["Back to position"]</a>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const input = document.getElementById('tagNameInput');
+            const datalist = document.getElementById('tagSuggestions');
+            const checkboxes = document.querySelectorAll('.tag-checkbox');
+            const btnRemove = document.getElementById('btnRemoveTags');
+            const removeForm = document.getElementById('removeTagsForm');
+
+            let debounceTimer = null;
+
+            input.addEventListener('input', function () {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(function () {
+                    const q = input.value.trim();
+                    if (q.length < 1) { datalist.innerHTML = ''; return; }
+
+                    fetch('/api/tags/search?q=' + encodeURIComponent(q))
+                        .then(r => r.json())
+                        .then(items => {
+                            datalist.innerHTML = '';
+                            items.forEach(t => {
+                                const opt = document.createElement('option');
+                                opt.value = t.name;
+                                datalist.appendChild(opt);
+                            });
+                        });
+                }, 300);
+            });
+
+            function updateRemoveBtn() {
+                const checked = document.querySelectorAll('.tag-checkbox:checked');
+                btnRemove.classList.toggle('d-none', checked.length < 1);
+            }
+
+            checkboxes.forEach(cb => cb.addEventListener('change', updateRemoveBtn));
+
+            removeForm.addEventListener('submit', function (e) {
+                if (!confirm('Remove selected tags?')) {
+                    e.preventDefault();
+                    return;
+                }
+                removeForm.querySelectorAll('input[name="tagIds"]').forEach(el => el.remove());
+                document.querySelectorAll('.tag-checkbox:checked').forEach(cb => {
+                    const hidden = document.createElement('input');
+                    hidden.type = 'hidden';
+                    hidden.name = 'tagIds';
+                    hidden.value = cb.value;
+                    removeForm.appendChild(hidden);
+                });
+            });
+        })();
+    </script>
+}

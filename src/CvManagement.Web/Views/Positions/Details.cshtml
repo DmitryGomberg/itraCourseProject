@@ -1,0 +1,185 @@
+@inject IViewLocalizer Localizer
+@model CvManagement.Web.Models.Positions.PositionDetailsViewModel
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<h2>@Model.Title</h2>
+
+<div class="mb-3">
+    <p>@Model.ShortDescription</p>
+    <p><strong>@Localizer["Public:"]</strong> @(Model.IsPublic ? Localizer["Yes"] : Localizer["No"]) | <strong>@Localizer["Max Projects:"]</strong> @Model.MaxProjects</p>
+</div>
+
+<hr />
+
+<div class="mb-4">
+    <h4>@Localizer["Attributes"]</h4>
+    @if (Model.Attributes.Any())
+    {
+        <table class="table table-sm">
+            <thead>
+                    <tr><th>@Localizer["Name"]</th><th>@Localizer["Data Type"]</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var attr in Model.Attributes)
+                {
+                    <tr>
+                        <td>@attr.Name</td>
+                        <td>@attr.DataTypeDisplay</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p class="text-muted">@Localizer["No attributes assigned."]</p>
+    }
+    <a asp-action="ManageAttributes" asp-route-id="@Model.Id" class="btn btn-outline-secondary btn-sm">@Localizer["Manage attributes"]</a>
+</div>
+
+<div class="mb-4">
+    <h4>@Localizer["Access Rules"]</h4>
+    @if (Model.AccessRules.Any())
+    {
+        <table class="table table-sm">
+            <thead>
+                    <tr><th>@Localizer["Attribute"]</th><th>@Localizer["Operator"]</th><th>@Localizer["Value"]</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var rule in Model.AccessRules)
+                {
+                    <tr>
+                        <td>@rule.AttributeName</td>
+                        <td>@rule.OperatorDisplay</td>
+                        <td>@rule.ComparisonValue</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p class="text-muted">@Localizer["No access rules defined."]</p>
+    }
+    <a asp-action="ManageAccessRules" asp-route-id="@Model.Id" class="btn btn-outline-secondary btn-sm">@Localizer["Manage access rules"]</a>
+</div>
+
+<div class="mb-4">
+    <h4>@Localizer["Relevant Tags"]</h4>
+    @if (Model.Tags.Any())
+    {
+        <p>@string.Join(", ", Model.Tags)</p>
+    }
+    else
+    {
+        <p class="text-muted">@Localizer["No tags assigned."]</p>
+    }
+    <a asp-action="ManageTags" asp-route-id="@Model.Id" class="btn btn-outline-secondary btn-sm">@Localizer["Manage tags"]</a>
+</div>
+
+<div class="mb-4">
+    <h4>@Localizer["Candidates (Published CVs)"]</h4>
+    @if (!Model.Cvs.Any())
+    {
+        <p class="text-muted">@Localizer["No published CVs yet."]</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead><tr><th>@Localizer["Candidate"]</th><th>@Localizer["Likes"]</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var cv in Model.Cvs)
+            {
+                <tr>
+                    <td>@cv.CandidateFirstLastName</td>
+                    <td>@cv.LikesCount</td>
+                    <td><a asp-controller="Cv" asp-action="Details" asp-route-id="@cv.Id">@Localizer["View CV"]</a></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+</div>
+
+<div class="mb-4">
+    <h4>@Localizer["Discussion"]</h4>
+    <div id="discussionPosts" style="max-height:400px; overflow-y:auto; border:1px solid #ddd; padding:10px; margin-bottom:10px;"></div>
+    <div class="mb-3">
+        <textarea id="discussionInput" class="form-control" rows="2" placeholder="@Localizer["Write a message..."]"></textarea>
+        <button id="discussionSendBtn" class="btn btn-primary mt-2">@Localizer["Send"]</button>
+    </div>
+</div>
+
+<hr />
+
+<form style="display:none">@Html.AntiForgeryToken()</form>
+
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">@Localizer["Edit position details"]</a>
+<a asp-action="Index" class="btn btn-secondary">@Localizer["Back to list"]</a>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.0/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.9/purify.min.js"></script>
+    <script>
+        (function () {
+            const positionId = '@Model.Id';
+            const postsContainer = document.getElementById('discussionPosts');
+            const input = document.getElementById('discussionInput');
+            const sendBtn = document.getElementById('discussionSendBtn');
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+
+            function renderPost(post) {
+                const wrapper = document.createElement('div');
+                wrapper.style.marginBottom = '8px';
+                const authorLink = post.authorProfileId
+                    ? `<a href="/PublicProfile/${post.authorProfileId}">${post.authorName}</a>`
+                    : post.authorName;
+                const avatarHtml = post.authorPhotoUrl
+                    ? `<img src="${post.authorPhotoUrl}" alt="avatar" style="width:24px;height:24px;border-radius:50%;object-fit:cover;margin-right:6px;vertical-align:middle;">`
+                    : '';
+                const date = new Date(post.createdAt).toLocaleString();
+                const header = document.createElement('div');
+                header.innerHTML = `${avatarHtml}<strong>${authorLink}</strong> <span class="text-muted small">${date}</span>`;
+                const body = document.createElement('div');
+                body.className = 'markdown-content';
+                body.setAttribute('data-raw-markdown', post.text);
+                const raw = post.text || '';
+                body.innerHTML = DOMPurify.sanitize(marked.parse(raw));
+                wrapper.appendChild(header);
+                wrapper.appendChild(body);
+                postsContainer.appendChild(wrapper);
+                postsContainer.scrollTop = postsContainer.scrollHeight;
+            }
+
+            fetch(`/Discussion/GetPosts?positionId=${positionId}`)
+                .then(r => r.json())
+                .then(posts => posts.forEach(renderPost));
+
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl('/hubs/discussion')
+                .withAutomaticReconnect()
+                .build();
+
+            connection.on('ReceivePost', renderPost);
+
+            connection.start()
+                .then(() => connection.invoke('JoinPositionGroup', positionId))
+                .catch(err => console.error(err));
+
+            sendBtn.addEventListener('click', function () {
+                const text = input.value.trim();
+                if (!text) return;
+                fetch('/Discussion/CreatePost', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
+                    body: JSON.stringify({ positionId: positionId, text: text })
+                }).then(r => {
+                    if (r.ok) input.value = '';
+                });
+            });
+        })();
+    </script>
+}

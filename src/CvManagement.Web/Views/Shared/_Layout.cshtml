@@ -1,0 +1,168 @@
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@inject CvManagement.Infrastructure.Data.ApplicationDbContext DbContext
+@inject Microsoft.AspNetCore.Identity.UserManager<CvManagement.Infrastructure.Identity.ApplicationUser> UserManager
+@{
+    string? currentUserPhotoUrl = null;
+    if (User.Identity?.IsAuthenticated == true)
+    {
+        var currentAppUser = await UserManager.GetUserAsync(User);
+        if (currentAppUser?.ProfileId != null)
+        {
+            currentUserPhotoUrl = await DbContext.Profiles
+                .Where(p => p.Id == currentAppUser.ProfileId.Value)
+                .Select(p => p.PhotoUrl)
+                .FirstOrDefaultAsync();
+        }
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CvManagement.Web</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/CvManagement.Web.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-toggleable-sm border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">CvManagement.Web</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation" style="font-size: 1.5rem; line-height: 1; border: 1px solid var(--border-color); color: var(--text-color);">
+                    ☰
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">@Localizer["Home"]</a>
+                        </li>
+                        @if (User.IsInRole("Recruiter") || User.IsInRole("Administrator"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Attributes" asp-action="Index">@Localizer["Attributes"]</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Positions" asp-action="Index">@Localizer["Positions"]</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("Candidate") || User.IsInRole("Administrator"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="BrowsePositions" asp-action="Index">@Localizer["Available Positions"]</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("Administrator"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Admin" asp-action="Users">@Localizer["Manage Users"]</a>
+                            </li>
+                        }
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Profile" asp-action="Index">@Localizer["My Profile"]</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Projects" asp-action="Index">@Localizer["My Projects"]</a>
+                            </li>
+                            <li class="nav-item d-flex align-items-center">
+                                @if (!string.IsNullOrEmpty(currentUserPhotoUrl))
+                                {
+                                    <img src="@currentUserPhotoUrl" alt="avatar" style="width:32px;height:32px;border-radius:50%;object-fit:cover;margin-right:8px;" />
+                                }
+                                <span class="navbar-text me-3">@User.Identity!.Name</span>
+                            </li>
+                            <li class="nav-item">
+                                <form asp-controller="Culture" asp-action="SetCulture" method="post" class="d-inline">
+                                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                                    <select name="culture" class="form-select form-select-sm d-inline w-auto" onchange="this.form.submit()">
+                                        <option value="en" selected="@(System.Globalization.CultureInfo.CurrentUICulture.Name == "en")">EN</option>
+                                        <option value="ru" selected="@(System.Globalization.CultureInfo.CurrentUICulture.Name == "ru")">RU</option>
+                                    </select>
+                                </form>
+                            </li>
+                            <li class="nav-item">
+                                <button id="themeToggleBtn" type="button" class="btn btn-sm btn-outline-secondary">🌙</button>
+                            </li>
+                            <li class="nav-item">
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-outline-secondary btn-sm">@Localizer["Logout"]</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <form asp-controller="Culture" asp-action="SetCulture" method="post" class="d-inline">
+                                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                                    <select name="culture" class="form-select form-select-sm d-inline w-auto" onchange="this.form.submit()">
+                                        <option value="en" selected="@(System.Globalization.CultureInfo.CurrentUICulture.Name == "en")">EN</option>
+                                        <option value="ru" selected="@(System.Globalization.CultureInfo.CurrentUICulture.Name == "ru")">RU</option>
+                                    </select>
+                                </form>
+                            </li>
+                            <li class="nav-item">
+                                <button id="themeToggleBtn" type="button" class="btn btn-sm btn-outline-secondary">🌙</button>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">@Localizer["Login"]</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Register">@Localizer["Register"]</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer">
+        <div class="container">
+            &copy; 2026 - CvManagement.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        (function () {
+            const btn = document.getElementById('themeToggleBtn');
+            const html = document.documentElement;
+
+            function updateButtonIcon() {
+                btn.textContent = html.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+            }
+            updateButtonIcon();
+
+            btn.addEventListener('click', function () {
+                const current = html.getAttribute('data-theme') || 'light';
+                const next = current === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+                updateButtonIcon();
+            });
+        })();
+    </script>
+</body>
+</html>

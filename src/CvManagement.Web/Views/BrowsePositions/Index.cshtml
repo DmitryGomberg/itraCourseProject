@@ -1,0 +1,43 @@
+@inject IViewLocalizer Localizer
+@model IEnumerable<CvManagement.Web.Models.CandidatePositions.AvailablePositionViewModel>
+@{
+    ViewData["Title"] = Localizer["Available Positions"];
+}
+
+<h2>@Localizer["Available Positions"]</h2>
+
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+@if (!Model.Any())
+{
+    <p class="text-muted">@Localizer["No positions match your profile."]</p>
+}
+else
+{
+    <div class="list-group">
+        @foreach (var item in Model)
+        {
+            <div class="list-group-item">
+                <h5 class="mb-1">@item.Title</h5>
+                <p class="mb-2">@item.ShortDescription</p>
+                @if (item.ExistingCvId.HasValue)
+                {
+                    <a asp-controller="Cv" asp-action="Details" asp-route-id="@item.ExistingCvId"
+                       class="btn btn-outline-primary btn-sm">
+                        @Localizer["View CV"] <span class="badge bg-secondary ms-1">@item.ExistingCvStatus</span>
+                    </a>
+                }
+                else
+                {
+                    <form asp-controller="Cv" asp-action="Create" method="post" class="d-inline">
+                        <input type="hidden" name="positionId" value="@item.Id" />
+                        <button type="submit" class="btn btn-primary btn-sm">@Localizer["Create CV"]</button>
+                    </form>
+                }
+            </div>
+        }
+    </div>
+}

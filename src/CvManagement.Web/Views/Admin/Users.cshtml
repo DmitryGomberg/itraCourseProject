@@ -1,0 +1,49 @@
+@inject IViewLocalizer Localizer
+@model List<CvManagement.Web.Models.Admin.UserRoleRowViewModel>
+@{
+    ViewData["Title"] = Localizer["User Role Management"];
+}
+
+<h2>@Localizer["User Role Management"]</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Email</th>
+            @foreach (var role in Model.First().AllRoles)
+            {
+                <th>@role</th>
+            }
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var row in Model)
+        {
+            <form method="post" asp-action="UpdateRoles" class="d-contents">
+                <tr>
+                    <td>
+                        <input type="hidden" name="UserId" value="@row.UserId" />
+                        @row.Email
+                    </td>
+                    @foreach (var role in row.AllRoles)
+                    {
+                        <td>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox"
+                                       id="role_@(row.UserId)_@role"
+                                       name="Roles"
+                                       value="@role"
+                                       checked="@(row.AssignedRoles.Contains(role))" />
+                                <label class="form-check-label" for="role_@(row.UserId)_@role">@role</label>
+                            </div>
+                        </td>
+                    }
+                    <td>
+                        <button type="submit" class="btn btn-primary btn-sm">@Localizer["Save"]</button>
+                    </td>
+                </tr>
+            </form>
+        }
+    </tbody>
+</table>

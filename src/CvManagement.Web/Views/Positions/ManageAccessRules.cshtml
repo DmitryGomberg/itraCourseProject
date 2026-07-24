@@ -1,0 +1,139 @@
+@inject IViewLocalizer Localizer
+@using CvManagement.Domain
+@model CvManagement.Web.Models.Positions.ManageAccessRulesViewModel
+@{
+    ViewData["Title"] = Localizer["Access Rules"] + " — " + Model.PositionTitle;
+}
+
+<h2>@Localizer["Access Rules"] — @Model.PositionTitle</h2>
+
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<h4>@Localizer["Existing Rules"]</h4>
+
+@if (Model.Rules.Any())
+{
+    <form method="post" asp-action="DeleteAccessRules" asp-route-id="@Model.PositionId" id="deleteRulesForm">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th style="width:40px"></th>
+                    <th>@Localizer["Attribute"]</th>
+                    <th>@Localizer["Operator"]</th>
+                    <th>@Localizer["Value"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var rule in Model.Rules)
+                {
+                    <tr>
+                        <td><input type="checkbox" class="form-check-input rule-checkbox" data-id="@rule.Id" /></td>
+                        <td>@rule.AttributeName</td>
+                        <td>@rule.OperatorDisplay</td>
+                        <td>@rule.ComparisonValue</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-danger btn-sm d-none" id="btnDeleteRules">@Localizer["Delete Selected"]</button>
+    </form>
+}
+else
+{
+    <p class="text-muted">@Localizer["No access rules defined."]</p>
+}
+
+<hr />
+
+<h4>@Localizer["Add Rule"]</h4>
+<form method="post" asp-action="AddAccessRule" asp-route-id="@Model.PositionId" class="row g-3 align-items-end">
+    <div class="col-md-3">
+        <label class="form-label">@Localizer["Attribute"]</label>
+        <select name="AttributeDefinitionId" id="ruleAttributeSelect" class="form-select">
+            @foreach (var attr in Model.AllAttributes)
+            {
+                <option value="@attr.Id" data-datatype="@attr.DataType">@attr.Name</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">@Localizer["Operator"]</label>
+        <select name="Operator" id="ruleOperatorSelect" class="form-select">
+            @foreach (var op in Enum.GetValues<AccessRuleOperator>())
+            {
+                var opName = op.ToString();
+                var types = Model.OperatorAllowedTypes.TryGetValue(opName, out var t) ? t : Array.Empty<string>();
+                <option value="@op" data-types="@string.Join(",", types)">@opName</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">@Localizer["Value"]</label>
+        <input type="text" name="ComparisonValue" class="form-control" placeholder="@Localizer["Value"]" />
+    </div>
+    <div class="col-md-3">
+        <button type="submit" class="btn btn-primary">@Localizer["Add Rule"]</button>
+    </div>
+</form>
+
+<div class="mt-4">
+    <a asp-action="Details" asp-route-id="@Model.PositionId" class="btn btn-secondary">@Localizer["Back to position"]</a>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const attrSelect = document.getElementById('ruleAttributeSelect');
+            const opSelect = document.getElementById('ruleOperatorSelect');
+            const checkboxes = document.querySelectorAll('.rule-checkbox');
+            const btnDelete = document.getElementById('btnDeleteRules');
+            const deleteForm = document.getElementById('deleteRulesForm');
+
+            function filterOperators() {
+                const selected = attrSelect.options[attrSelect.selectedIndex];
+                const dataType = selected ? selected.dataset.datatype : '';
+                let firstAvailable = null;
+
+                for (const opt of opSelect.options) {
+                    const types = opt.dataset.types ? opt.dataset.types.split(',') : [];
+                    const allowed = types.includes(dataType);
+                    opt.disabled = !allowed;
+                    opt.hidden = !allowed;
+                    if (allowed && !firstAvailable) firstAvailable = opt;
+                }
+
+                if (firstAvailable && opSelect.options[opSelect.selectedIndex]?.disabled) {
+                    opSelect.value = firstAvailable.value;
+                }
+            }
+
+            attrSelect.addEventListener('change', filterOperators);
+            filterOperators();
+
+            function updateDeleteBtn() {
+                const checked = document.querySelectorAll('.rule-checkbox:checked');
+                btnDelete.classList.toggle('d-none', checked.length < 1);
+            }
+
+            checkboxes.forEach(cb => cb.addEventListener('change', updateDeleteBtn));
+
+            deleteForm.addEventListener('submit', function (e) {
+                if (!confirm('Delete selected rules?')) {
+                    e.preventDefault();
+                    return;
+                }
+                deleteForm.querySelectorAll('input[name="ruleIds"]').forEach(el => el.remove());
+                document.querySelectorAll('.rule-checkbox:checked').forEach(cb => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'ruleIds';
+                    input.value = cb.dataset.id;
+                    deleteForm.appendChild(input);
+                });
+            });
+        })();
+    </script>
+}

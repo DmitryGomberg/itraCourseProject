@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Public:" xml:space="preserve">
+    <value>Публичная:</value>
+  </data>
+  <data name="Max Projects:" xml:space="preserve">
+    <value>Макс. проектов:</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Да</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>Нет</value>
+  </data>
+  <data name="Attributes" xml:space="preserve">
+    <value>Атрибуты</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Имя</value>
+  </data>
+  <data name="Data Type" xml:space="preserve">
+    <value>Тип данных</value>
+  </data>
+  <data name="No attributes assigned." xml:space="preserve">
+    <value>Атрибуты не назначены.</value>
+  </data>
+  <data name="Manage attributes" xml:space="preserve">
+    <value>Управление атрибутами</value>
+  </data>
+  <data name="Access Rules" xml:space="preserve">
+    <value>Правила доступа</value>
+  </data>
+  <data name="Attribute" xml:space="preserve">
+    <value>Атрибут</value>
+  </data>
+  <data name="Operator" xml:space="preserve">
+    <value>Оператор</value>
+  </data>
+  <data name="Value" xml:space="preserve">
+    <value>Значение</value>
+  </data>
+  <data name="No access rules defined." xml:space="preserve">
+    <value>Правила доступа не определены.</value>
+  </data>
+  <data name="Manage access rules" xml:space="preserve">
+    <value>Управление правилами доступа</value>
+  </data>
+  <data name="Relevant Tags" xml:space="preserve">
+    <value>Релевантные теги</value>
+  </data>
+  <data name="No tags assigned." xml:space="preserve">
+    <value>Теги не назначены.</value>
+  </data>
+  <data name="Manage tags" xml:space="preserve">
+    <value>Управление тегами</value>
+  </data>
+  <data name="Candidates (Published CVs)" xml:space="preserve">
+    <value>Кандидаты (опубликованные резюме)</value>
+  </data>
+  <data name="No published CVs yet." xml:space="preserve">
+    <value>Опубликованных резюме пока нет.</value>
+  </data>
+  <data name="View CV" xml:space="preserve">
+    <value>Просмотреть резюме</value>
+  </data>
+  <data name="Discussion" xml:space="preserve">
+    <value>Обсуждение</value>
+  </data>
+  <data name="Write a message..." xml:space="preserve">
+    <value>Напишите сообщение...</value>
+  </data>
+  <data name="Send" xml:space="preserve">
+    <value>Отправить</value>
+  </data>
+  <data name="Edit position details" xml:space="preserve">
+    <value>Редактировать данные позиции</value>
+  </data>
+  <data name="Back to list" xml:space="preserve">
+    <value>Назад к списку</value>
+  </data>
+  <data name="Candidate" xml:space="preserve">
+    <value>Кандидат</value>
+  </data>
+  <data name="Likes" xml:space="preserve">
+    <value>Лайки</value>
+  </data>
+</root>

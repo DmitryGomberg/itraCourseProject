@@ -1,0 +1,291 @@
+@inject IViewLocalizer Localizer
+@model CvManagement.Web.Models.Cv.CvSummaryViewModel
+@{
+    ViewData["Title"] = Localizer["CV —"] + " " + Model.PositionTitle;
+}
+
+<h2>@Model.PositionTitle</h2>
+<p class="text-muted mb-3">@Model.PositionShortDescription</p>
+
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<div class="mb-3">
+    @if (Model.IsDraft)
+    {
+        <span class="badge bg-secondary">@Localizer["Draft"]</span>
+    }
+    else
+    {
+        <span class="badge bg-success">@Localizer["Published"]</span>
+    }
+
+    @if (Model.CanPublish)
+    {
+        <form asp-action="Publish" method="post" class="d-inline ms-2">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <input type="hidden" name="version" value="@Model.Version" />
+            <button type="submit" class="btn btn-success btn-sm">@Localizer["Publish"]</button>
+        </form>
+    }
+    else if (Model.CanEdit && !Model.CanPublish)
+    {
+        <button type="button" class="btn btn-success btn-sm ms-2" disabled
+                title="Заполните все поля">@Localizer["Publish"]</button>
+    }
+
+    @if (Model.CanUnpublish)
+    {
+        <form asp-action="Unpublish" method="post" class="d-inline ms-2">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <input type="hidden" name="version" value="@Model.Version" />
+            <button type="submit" class="btn btn-outline-secondary btn-sm">@Localizer["Unpublish"]</button>
+        </form>
+    }
+
+    @if (Model.CanLike)
+    {
+        <form method="post" asp-action="ToggleLike" asp-route-id="@Model.Id" style="display:inline">
+            <button type="submit" class="btn @(Model.LikedByCurrentUser ? "btn-danger" : "btn-outline-danger")">
+                @(Model.LikedByCurrentUser ? Localizer["♥ Liked"] : Localizer["♡ Like"]) (@Model.LikesCount)
+            </button>
+        </form>
+    }
+    else if (Model.LikesCount > 0)
+    {
+        <span>♥ @Model.LikesCount @Localizer["likes"]</span>
+    }
+</div>
+
+<hr />
+
+<h4>@Localizer["Attributes"]</h4>
+
+@if (Model.CanEdit)
+{
+    @Html.AntiForgeryToken()
+}
+
+@foreach (var attr in Model.Attributes)
+{
+    <div class="mb-3">
+        <label class="form-label fw-bold @(attr.IsEmpty ? "text-danger" : "")">@attr.Name <small class="text-muted">(@attr.DataType)</small></label>
+        <div class="input-group">
+            @if (Model.CanEdit)
+            {
+                @switch (attr.DataType)
+                {
+                    case "String":
+                        <input type="text" class="form-control cv-attr-field @(attr.IsEmpty ? "border-danger" : "")"
+                               data-attribute-id="@attr.AttributeDefinitionId"
+                               data-type="StringValue"
+                               value="@attr.StringValue" />
+                        break;
+                    case "Text":
+                        <textarea class="form-control cv-attr-field @(attr.IsEmpty ? "border-danger" : "")"
+                                  data-attribute-id="@attr.AttributeDefinitionId"
+                                  data-type="TextValue"
+                                  rows="3">@attr.TextValue</textarea>
+                        break;
+                    case "Numeric":
+                        <input type="number" step="any" class="form-control cv-attr-field @(attr.IsEmpty ? "border-danger" : "")"
+                               data-attribute-id="@attr.AttributeDefinitionId"
+                               data-type="NumericValue"
+                               value="@(attr.NumericValue?.ToString() ?? "")" />
+                        break;
+                    case "Date":
+                        <input type="date" class="form-control cv-attr-field @(attr.IsEmpty ? "border-danger" : "")"
+                               data-attribute-id="@attr.AttributeDefinitionId"
+                               data-type="DateValue"
+                               value="@(attr.DateValue?.ToString("yyyy-MM-dd") ?? "")" />
+                        break;
+                    case "Period":
+                        <input type="date" class="form-control cv-attr-field @(attr.IsEmpty ? "border-danger" : "")"
+                               data-attribute-id="@attr.AttributeDefinitionId"
+                               data-type="PeriodStart"
+                               value="@(attr.PeriodStart?.ToString("yyyy-MM-dd") ?? "")" />
+                        <span class="input-group-text">—</span>
+                        <input type="date" class="form-control cv-attr-field @(attr.IsEmpty ? "border-danger" : "")"
+                               data-attribute-id="@attr.AttributeDefinitionId"
+                               data-type="PeriodEnd"
+                               value="@(attr.PeriodEnd?.ToString("yyyy-MM-dd") ?? "")" />
+                        break;
+                    case "Boolean":
+                        <div class="form-check mt-2">
+                            <input type="checkbox" class="form-check-input cv-attr-field @(attr.IsEmpty ? "border-danger" : "")"
+                                   data-attribute-id="@attr.AttributeDefinitionId"
+                                   data-type="BooleanValue"
+                                   @(attr.BooleanValue == true ? "checked" : "") />
+                            <label class="form-check-label">@Localizer["Yes"]</label>
+                        </div>
+                        break;
+                    case "Option":
+                        <select class="form-select cv-attr-field @(attr.IsEmpty ? "border-danger" : "")"
+                                data-attribute-id="@attr.AttributeDefinitionId"
+                                data-type="SelectedOptionId">
+                            <option value="">@Localizer["— none —"]</option>
+                            @foreach (var opt in attr.Options)
+                            {
+                                if (attr.SelectedOptionId == opt.Id)
+                                {
+                                    <option value="@opt.Id" selected>@opt.Value</option>
+                                }
+                                else
+                                {
+                                    <option value="@opt.Id">@opt.Value</option>
+                                }
+                            }
+                        </select>
+                        break;
+                    case "Image":
+                        <span class="text-muted">@Localizer["Image upload — coming soon"]</span>
+                        break;
+                }
+                <span class="input-group-text save-status"></span>
+            }
+            else
+            {
+                @switch (attr.DataType)
+                {
+                    case "String":
+                        <span>@(attr.StringValue ?? "—")</span>
+                        break;
+                    case "Text":
+                        <span>@(attr.TextValue ?? "—")</span>
+                        break;
+                    case "Numeric":
+                        <span>@(attr.NumericValue?.ToString() ?? "—")</span>
+                        break;
+                    case "Date":
+                        <span>@(attr.DateValue?.ToString("yyyy-MM-dd") ?? "—")</span>
+                        break;
+                    case "Period":
+                        <span>@(attr.PeriodStart?.ToString("yyyy-MM-dd") ?? "—") — @(attr.PeriodEnd?.ToString("yyyy-MM-dd") ?? "—")</span>
+                        break;
+                    case "Boolean":
+                        <span>@(attr.BooleanValue == true ? Localizer["Yes"] : attr.BooleanValue == false ? Localizer["No"] : "—")</span>
+                        break;
+                    case "Option":
+                        var selectedOpt = attr.Options.FirstOrDefault(o => o.Id == attr.SelectedOptionId);
+                        <span>@(selectedOpt.Value ?? "—")</span>
+                        break;
+                    case "Image":
+                        <span class="text-muted">—</span>
+                        break;
+                }
+            }
+        </div>
+    </div>
+}
+
+<hr />
+
+<h4>@Localizer["Relevant Projects"]</h4>
+
+@if (!Model.Projects.Any())
+{
+    <p class="text-muted">@Localizer["No matching projects."]</p>
+}
+else
+{
+    @foreach (var project in Model.Projects)
+    {
+        <div class="card mb-2">
+            <div class="card-body">
+                <h5 class="card-title">@project.Name</h5>
+                <div class="text-muted small mb-1">@project.PeriodDisplay</div>
+                <div class="markdown-content" data-raw-markdown="@project.DescriptionMarkdown"></div>
+                @if (project.Tags.Any())
+                {
+                    <div>
+                        @foreach (var tag in project.Tags)
+                        {
+                            <span class="badge bg-info me-1">@tag</span>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+}
+
+<hr />
+
+@if (Model.CanEdit)
+{
+    <a asp-controller="BrowsePositions" asp-action="Index" class="btn btn-secondary">@Localizer["Back to positions"]</a>
+}
+else
+{
+    <a asp-controller="BrowsePositions" asp-action="Index" class="btn btn-secondary">@Localizer["Back to positions"]</a>
+}
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.0/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.9/purify.min.js"></script>
+    <script>
+        (function () {
+            document.querySelectorAll('.markdown-content').forEach(function (el) {
+                const raw = el.getAttribute('data-raw-markdown') || '';
+                const html = marked.parse(raw);
+                el.innerHTML = DOMPurify.sanitize(html);
+            });
+        })();
+    </script>
+    @if (Model.CanEdit)
+    {
+        <script>
+            (function () {
+                const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+                const DEBOUNCE_MS = 6000;
+                const timers = new Map();
+
+                function debounced(key, fn) {
+                    clearTimeout(timers.get(key));
+                    timers.set(key, setTimeout(fn, DEBOUNCE_MS));
+                }
+
+                function showStatus(el, text) {
+                    el.textContent = text;
+                    if (text === 'Saved') {
+                        setTimeout(() => { el.textContent = ''; }, 2000);
+                    }
+                }
+
+                document.querySelectorAll('.cv-attr-field').forEach(input => {
+                    const statusEl = input.closest('.input-group')?.querySelector('.save-status');
+                    const eventType = (input.tagName === 'SELECT' || input.type === 'checkbox' || input.type === 'date') ? 'change' : 'input';
+
+                    input.addEventListener(eventType, function () {
+                        debounced('attr-' + input.dataset.attributeId + '-' + input.dataset.type, function () {
+                            if (statusEl) showStatus(statusEl, 'Saving...');
+
+                            const body = { attributeDefinitionId: input.dataset.attributeId };
+                            const val = input.type === 'checkbox' ? input.checked
+                                : input.tagName === 'SELECT' ? (input.value || null)
+                                : input.value || null;
+
+                            body[input.dataset.type] = val;
+
+                            fetch('/Profile/UpdateAttributeValue', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'RequestVerificationToken': token
+                                },
+                                body: JSON.stringify(body)
+                            })
+                            .then(r => {
+                                if (r.ok) { if (statusEl) showStatus(statusEl, 'Saved'); return; }
+                                throw { error: true };
+                            })
+                            .catch(() => { if (statusEl) showStatus(statusEl, 'Error'); });
+                        });
+                    });
+                });
+            })();
+        </script>
+    }
+}

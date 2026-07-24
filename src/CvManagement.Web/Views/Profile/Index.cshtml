@@ -1,0 +1,296 @@
+@inject IViewLocalizer Localizer
+@model CvManagement.Web.Models.Profile.ProfileEditViewModel
+@using CvManagement.Domain
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@{
+    ViewData["Title"] = Localizer["My Profile"];
+}
+
+<h2>@Localizer["My Profile"]</h2>
+
+@Html.AntiForgeryToken()
+
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<div id="profileContainer" data-version="@Model.Version">
+
+    <div class="mb-4">
+        <h4>@Localizer["Me"]</h4>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">@Localizer["First Name"]</label>
+                <div class="input-group">
+                    <input type="text" class="form-control me-field" data-field="FirstName" value="@Model.FirstName" />
+                    <span class="input-group-text save-status"></span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">@Localizer["Last Name"]</label>
+                <div class="input-group">
+                    <input type="text" class="form-control me-field" data-field="LastName" value="@Model.LastName" />
+                    <span class="input-group-text save-status"></span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">@Localizer["Location"]</label>
+                <div class="input-group">
+                    <input type="text" class="form-control me-field" data-field="Location" value="@Model.Location" />
+                    <span class="input-group-text save-status"></span>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3">
+            <label class="form-label">@Localizer["Photo"]</label>
+            <div>
+                <img id="profilePhotoPreview" src="@(Model.PhotoUrl ?? "")"
+                     style="width:100px;height:100px;object-fit:cover;display:@(string.IsNullOrEmpty(Model.PhotoUrl) ? "none" : "block")" />
+            </div>
+            <div class="mt-1">
+                <input type="file" id="photoFileInput" accept="image/*" />
+                <span id="photoUploadStatus" class="save-status ms-2"></span>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="mb-4">
+        <h4>@Localizer["Info"]</h4>
+        @foreach (var attr in Model.InfoAttributes)
+        {
+            <div class="mb-3">
+                <label class="form-label fw-bold">@attr.Name <small class="text-muted">(@attr.DataType)</small></label>
+                <div class="input-group">
+                    @switch (attr.DataType)
+                    {
+                        case "String":
+                            <input type="text" class="form-control info-field"
+                                   data-attribute-id="@attr.AttributeDefinitionId"
+                                   data-type="StringValue"
+                                   value="@attr.StringValue" />
+                            break;
+                        case "Text":
+                            <textarea class="form-control info-field"
+                                      data-attribute-id="@attr.AttributeDefinitionId"
+                                      data-type="TextValue"
+                                      rows="3">@attr.TextValue</textarea>
+                            break;
+                        case "Numeric":
+                            <input type="number" step="any" class="form-control info-field"
+                                   data-attribute-id="@attr.AttributeDefinitionId"
+                                   data-type="NumericValue"
+                                   value="@(attr.NumericValue?.ToString() ?? "")" />
+                            break;
+                        case "Date":
+                            <input type="date" class="form-control info-field"
+                                   data-attribute-id="@attr.AttributeDefinitionId"
+                                   data-type="DateValue"
+                                   value="@(attr.DateValue?.ToString("yyyy-MM-dd") ?? "")" />
+                            break;
+                        case "Period":
+                            <input type="date" class="form-control info-field"
+                                   data-attribute-id="@attr.AttributeDefinitionId"
+                                   data-type="PeriodStart"
+                                   value="@(attr.PeriodStart?.ToString("yyyy-MM-dd") ?? "")" />
+                            <span class="input-group-text">—</span>
+                            <input type="date" class="form-control info-field"
+                                   data-attribute-id="@attr.AttributeDefinitionId"
+                                   data-type="PeriodEnd"
+                                   value="@(attr.PeriodEnd?.ToString("yyyy-MM-dd") ?? "")" />
+                            break;
+                        case "Boolean":
+                            <div class="form-check mt-2">
+                                <input type="checkbox" class="form-check-input info-field"
+                                       data-attribute-id="@attr.AttributeDefinitionId"
+                                       data-type="BooleanValue"
+                                       @(attr.BooleanValue == true ? "checked" : "") />
+                                <label class="form-check-label">@Localizer["Yes"]</label>
+                            </div>
+                            break;
+                        case "Option":
+                            <select class="form-select info-field"
+                                    data-attribute-id="@attr.AttributeDefinitionId"
+                                    data-type="SelectedOptionId">
+                                <option value="">@Localizer["— none —"]</option>
+                                @foreach (var opt in attr.Options)
+                                {
+                                    if (attr.SelectedOptionId == opt.Id)
+                                    {
+                                        <option value="@opt.Id" selected>@opt.Value</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@opt.Id">@opt.Value</option>
+                                    }
+                                }
+                            </select>
+                            break;
+                        case "Image":
+                            <span class="text-muted">@Localizer["Image upload — coming soon"]</span>
+                            break;
+                    }
+                    <span class="input-group-text save-status"></span>
+                </div>
+            </div>
+        }
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            const container = document.getElementById('profileContainer');
+            const DEBOUNCE_MS = 6000;
+
+            function getVersion() {
+                return parseInt(container.dataset.version, 10) || 0;
+            }
+
+            function setVersion(v) {
+                container.dataset.version = v;
+            }
+
+            function showStatus(el, text) {
+                el.textContent = text;
+                if (text === 'Saved') {
+                    setTimeout(() => { el.textContent = ''; }, 2000);
+                }
+            }
+
+            const timers = new Map();
+
+            function debounced(key, fn) {
+                clearTimeout(timers.get(key));
+                timers.set(key, setTimeout(fn, DEBOUNCE_MS));
+            }
+
+            document.querySelectorAll('.me-field').forEach(input => {
+                const statusEl = input.closest('.input-group').querySelector('.save-status');
+                input.addEventListener('input', function () {
+                    debounced('me-' + input.dataset.field, function () {
+                        showStatus(statusEl, 'Saving...');
+                        fetch('/Profile/UpdateField', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': token
+                            },
+                            body: JSON.stringify({
+                                field: input.dataset.field,
+                                value: input.value,
+                                version: getVersion()
+                            })
+                        })
+                        .then(r => {
+                            if (r.ok) return r.json();
+                            if (r.status === 409) return r.json().then(d => { throw { conflict: true, message: d.message }; });
+                            throw { error: true };
+                        })
+                        .then(d => {
+                            setVersion(d.newVersion);
+                            showStatus(statusEl, 'Saved');
+                        })
+                        .catch(err => {
+                            if (err.conflict) {
+                                showStatus(statusEl, 'Error');
+                                alert(err.message + '\nReload the page to continue.');
+                            } else {
+                                showStatus(statusEl, 'Error');
+                            }
+                        });
+                    });
+                });
+            });
+
+            document.querySelectorAll('.info-field').forEach(input => {
+                const statusEl = input.closest('.input-group').querySelector('.save-status');
+                const eventType = (input.tagName === 'SELECT' || input.type === 'checkbox' || input.type === 'date') ? 'change' : 'input';
+
+                input.addEventListener(eventType, function () {
+                    debounced('info-' + input.dataset.attributeId + '-' + input.dataset.type, function () {
+                        showStatus(statusEl, 'Saving...');
+
+                        const body = { attributeDefinitionId: input.dataset.attributeId };
+                        const val = input.type === 'checkbox' ? input.checked
+                            : input.tagName === 'SELECT' ? (input.value || null)
+                            : input.value || null;
+
+                        body[input.dataset.type] = val;
+
+                        fetch('/Profile/UpdateAttributeValue', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': token
+                            },
+                            body: JSON.stringify(body)
+                        })
+                        .then(r => {
+                            if (r.ok) { showStatus(statusEl, 'Saved'); return; }
+                            throw { error: true };
+                        })
+                        .catch(() => { showStatus(statusEl, 'Error'); });
+                    });
+                });
+            });
+
+            const cloudName = '@Configuration["Cloudinary:CloudName"]';
+            const uploadPreset = '@Configuration["Cloudinary:UploadPreset"]';
+
+            document.getElementById('photoFileInput').addEventListener('change', async function (e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const statusEl = document.getElementById('photoUploadStatus');
+                statusEl.textContent = 'Uploading...';
+
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', uploadPreset);
+
+                try {
+                    const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    if (!uploadResponse.ok) throw new Error('Cloudinary upload failed');
+                    const uploadResult = await uploadResponse.json();
+                    const photoUrl = uploadResult.secure_url;
+
+                    const saveResponse = await fetch('/Profile/UpdateField', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': token
+                        },
+                        body: JSON.stringify({ field: 'PhotoUrl', value: photoUrl, version: getVersion() })
+                    });
+
+                    if (saveResponse.status === 409) {
+                        statusEl.textContent = '';
+                        alert('Профиль был изменён в другом месте, обновите страницу');
+                        return;
+                    }
+                    if (!saveResponse.ok) throw new Error('Save failed');
+
+                    const result = await saveResponse.json();
+                    setVersion(result.newVersion);
+
+                    const img = document.getElementById('profilePhotoPreview');
+                    img.src = photoUrl;
+                    img.style.display = 'block';
+                    statusEl.textContent = 'Saved';
+                    setTimeout(() => statusEl.textContent = '', 2000);
+                } catch (err) {
+                    statusEl.textContent = 'Error';
+                    console.error(err);
+                }
+            });
+        })();
+    </script>
+}
