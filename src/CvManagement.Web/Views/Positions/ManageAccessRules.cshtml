@@ -12,76 +12,76 @@
     <div class="alert alert-danger">@error</div>
 }
 
-<h4>@Localizer["Existing Rules"]</h4>
+<div class="section-card mb-4">
+    <div class="section-title">@Localizer["Existing Rules"]</div>
 
-@if (Model.Rules.Any())
-{
-    <form method="post" asp-action="DeleteAccessRules" asp-route-id="@Model.PositionId" id="deleteRulesForm">
-        <table class="table table-sm">
-            <thead>
-                <tr>
-                    <th style="width:40px"></th>
-                    <th>@Localizer["Attribute"]</th>
-                    <th>@Localizer["Operator"]</th>
-                    <th>@Localizer["Value"]</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var rule in Model.Rules)
-                {
+    @if (Model.Rules.Any())
+    {
+        <form method="post" asp-action="DeleteAccessRules" asp-route-id="@Model.PositionId" id="deleteRulesForm">
+            <table class="table table-sm table-borderless table-hover mb-2">
+                <thead>
                     <tr>
-                        <td><input type="checkbox" class="form-check-input rule-checkbox" data-id="@rule.Id" /></td>
-                        <td>@rule.AttributeName</td>
-                        <td>@rule.OperatorDisplay</td>
-                        <td>@rule.ComparisonValue</td>
+                        <th style="width:40px"></th>
+                        <th>@Localizer["Attribute"]</th>
+                        <th>@Localizer["Operator"]</th>
+                        <th>@Localizer["Value"]</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-        <button type="submit" class="btn btn-danger btn-sm d-none" id="btnDeleteRules">@Localizer["Delete Selected"]</button>
-    </form>
-}
-else
-{
-    <p class="text-muted">@Localizer["No access rules defined."]</p>
-}
-
-<hr />
-
-<h4>@Localizer["Add Rule"]</h4>
-<form method="post" asp-action="AddAccessRule" asp-route-id="@Model.PositionId" class="row g-3 align-items-end">
-    <div class="col-md-3">
-        <label class="form-label">@Localizer["Attribute"]</label>
-        <select name="AttributeDefinitionId" id="ruleAttributeSelect" class="form-select">
-            @foreach (var attr in Model.AllAttributes)
-            {
-                <option value="@attr.Id" data-datatype="@attr.DataType">@attr.Name</option>
-            }
-        </select>
-    </div>
-    <div class="col-md-3">
-        <label class="form-label">@Localizer["Operator"]</label>
-        <select name="Operator" id="ruleOperatorSelect" class="form-select">
-            @foreach (var op in Enum.GetValues<AccessRuleOperator>())
-            {
-                var opName = op.ToString();
-                var types = Model.OperatorAllowedTypes.TryGetValue(opName, out var t) ? t : Array.Empty<string>();
-                <option value="@op" data-types="@string.Join(",", types)">@opName</option>
-            }
-        </select>
-    </div>
-    <div class="col-md-3">
-        <label class="form-label">@Localizer["Value"]</label>
-        <input type="text" name="ComparisonValue" class="form-control" placeholder="@Localizer["Value"]" />
-    </div>
-    <div class="col-md-3">
-        <button type="submit" class="btn btn-primary">@Localizer["Add Rule"]</button>
-    </div>
-</form>
-
-<div class="mt-4">
-    <a asp-action="Details" asp-route-id="@Model.PositionId" class="btn btn-secondary">@Localizer["Back to position"]</a>
+                </thead>
+                <tbody>
+                    @foreach (var rule in Model.Rules)
+                    {
+                        <tr>
+                            <td><input type="checkbox" class="form-check-input rule-checkbox" data-id="@rule.Id" /></td>
+                            <td>@rule.AttributeName</td>
+                            <td>@rule.OperatorDisplay</td>
+                            <td>@rule.ComparisonValue</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-danger btn-sm d-none" id="btnDeleteRules">@Localizer["Delete Selected"]</button>
+        </form>
+    }
+    else
+    {
+        <p class="text-muted mb-0">@Localizer["No access rules defined."]</p>
+    }
 </div>
+
+<div class="section-card mb-4">
+    <div class="section-title">@Localizer["Add Rule"]</div>
+    <form method="post" asp-action="AddAccessRule" asp-route-id="@Model.PositionId" class="row g-3 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label">@Localizer["Attribute"]</label>
+            <select name="AttributeDefinitionId" id="ruleAttributeSelect" class="form-select">
+                @foreach (var attr in Model.AllAttributes)
+                {
+                    <option value="@attr.Id" data-datatype="@attr.DataType">@attr.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">@Localizer["Operator"]</label>
+            <select name="Operator" id="ruleOperatorSelect" class="form-select">
+                @foreach (var op in Enum.GetValues<AccessRuleOperator>())
+                {
+                    var opName = op.ToString();
+                    var types = Model.OperatorAllowedTypes.TryGetValue(opName, out var t) ? t : Array.Empty<string>();
+                    <option value="@op" data-types="@string.Join(",", types)">@opName</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">@Localizer["Value"]</label>
+            <input type="text" name="ComparisonValue" class="form-control" placeholder="@Localizer["Value"]" />
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary">@Localizer["Add Rule"]</button>
+        </div>
+    </form>
+</div>
+
+<a asp-action="Details" asp-route-id="@Model.PositionId" class="btn btn-secondary">@Localizer["Back to position"]</a>
 
 @section Scripts {
     <script>

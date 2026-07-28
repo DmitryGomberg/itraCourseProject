@@ -1,0 +1,68 @@
+@inject IViewLocalizer Localizer
+@model CvManagement.Web.Models.Search.SearchResultsViewModel
+@{
+    ViewData["Title"] = Model.Tag != null
+        ? Localizer["Results for tag: {0}", Model.Tag]
+        : Localizer["Search results for: {0}", Model.Query];
+}
+
+<h2>
+    @if (Model.Tag != null)
+    {
+        @Localizer["Results for tag: {0}", Model.Tag]
+    }
+    else
+    {
+        @Localizer["Search results for: {0}", Model.Query]
+    }
+</h2>
+
+@if (Model.PositionResults.Any())
+{
+    <div class="section-card mb-4">
+        <div class="section-title">@Localizer["Positions"]</div>
+        @foreach (var pos in Model.PositionResults)
+        {
+            <div class="search-result-item">
+                @if (User.IsInRole("Recruiter") || User.IsInRole("Administrator"))
+                {
+                    <a asp-controller="Positions" asp-action="Details" asp-route-id="@pos.Id" style="text-decoration:none;color:inherit;">
+                        <h6 class="mb-1">@pos.Title</h6>
+                        <p class="mb-0 text-muted">@pos.ShortDescription</p>
+                    </a>
+                }
+                else
+                {
+                    <h6 class="mb-1">@pos.Title</h6>
+                    <p class="mb-0 text-muted">@pos.ShortDescription</p>
+                }
+            </div>
+        }
+    </div>
+}
+
+@if (Model.CvResults.Any())
+{
+    <div class="section-card mb-4">
+        <div class="section-title">@Localizer["Candidates (CVs)"]</div>
+        @foreach (var cv in Model.CvResults)
+        {
+            <a asp-controller="Cv" asp-action="Details" asp-route-id="@cv.Id" style="text-decoration:none;color:inherit;">
+                <div class="search-result-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-0">@cv.CandidateName</h6>
+                        <small class="text-muted">@cv.PositionTitle</small>
+                    </div>
+                    <span class="badge bg-primary">♥ @cv.LikesCount</span>
+                </div>
+            </a>
+        }
+    </div>
+}
+
+@if (!Model.PositionResults.Any() && !Model.CvResults.Any())
+{
+    <div class="section-card text-center py-5">
+        <p class="text-muted mb-0">@Localizer["No results found"]</p>
+    </div>
+}

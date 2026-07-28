@@ -11,28 +11,28 @@
     <a asp-controller="BrowsePositions" asp-action="Index" class="btn btn-primary mb-4">@Localizer["Browse available positions"]</a>
 }
 
-<div class="row mb-4">
+<div class="row mb-4 g-3">
     <div class="col-md-4">
-        <div class="card text-center">
-            <div class="card-body">
-                <h2 class="card-title">@Model.TotalCandidates</h2>
-                <p class="card-text text-muted">@Localizer["Candidates"]</p>
+        <div class="card stat-card stat-primary">
+            <div class="card-body text-center">
+                <div class="stat-number">@Model.TotalCandidates</div>
+                <div class="stat-label">@Localizer["Candidates"]</div>
             </div>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card text-center">
-            <div class="card-body">
-                <h2 class="card-title">@Model.TotalPositions</h2>
-                <p class="card-text text-muted">@Localizer["Positions"]</p>
+        <div class="card stat-card stat-success">
+            <div class="card-body text-center">
+                <div class="stat-number">@Model.TotalPositions</div>
+                <div class="stat-label">@Localizer["Positions"]</div>
             </div>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card text-center">
-            <div class="card-body">
-                <h2 class="card-title">@Model.TotalPublishedCvs</h2>
-                <p class="card-text text-muted">@Localizer["Published CVs"]</p>
+        <div class="card stat-card stat-info">
+            <div class="card-body text-center">
+                <div class="stat-number">@Model.TotalPublishedCvs</div>
+                <div class="stat-label">@Localizer["Published CVs"]</div>
             </div>
         </div>
     </div>
@@ -41,9 +41,9 @@
 @if (Model.LatestPositions.Any())
 {
     var canManagePositions = User.IsInRole("Recruiter") || User.IsInRole("Administrator");
-    <div class="mb-4">
-        <h4>@Localizer["Latest Positions"]</h4>
-        <ul class="list-group">
+    <div class="section-card mb-4">
+        <div class="section-title">@Localizer["Latest Positions"]</div>
+        <ul class="list-group list-group-flush">
             @foreach (var pos in Model.LatestPositions)
             {
                 if (canManagePositions)
@@ -63,9 +63,9 @@
 @if (Model.TopPositions.Any())
 {
     var canManagePositions = User.IsInRole("Recruiter") || User.IsInRole("Administrator");
-    <div class="mb-4">
-        <h4>@Localizer["Top Positions"]</h4>
-        <ul class="list-group">
+    <div class="section-card mb-4">
+        <div class="section-title">@Localizer["Top Positions"]</div>
+        <ul class="list-group list-group-flush">
             @foreach (var pos in Model.TopPositions)
             {
                 if (canManagePositions)
@@ -90,13 +90,15 @@
 
 @if (Model.TagCloud.Any())
 {
-    <div class="mb-4">
-        <h4>@Localizer["Popular Tags"]</h4>
+    <div class="section-card mb-4">
+        <div class="section-title">@Localizer["Popular Tags"]</div>
         <div class="d-flex flex-wrap gap-2">
             @foreach (var tag in Model.TagCloud)
             {
                 var fontSize = Math.Min(tag.UsageCount * 2, 20);
-                <span class="badge bg-secondary" style="font-size: calc(12px + @(fontSize)px);">@tag.Name</span>
+                <a asp-controller="Search" asp-action="Index" asp-route-tag="@tag.Name"
+                   class="badge bg-secondary text-decoration-none"
+                   style="font-size: calc(12px + @(fontSize)px);">@tag.Name</a>
             }
         </div>
     </div>

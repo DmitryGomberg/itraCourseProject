@@ -1,0 +1,153 @@
+/* Component-specific styles */
+
+/* Position card in BrowsePositions */
+.position-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 12px;
+    transition: var(--transition);
+}
+.position-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+.position-card h5 {
+    margin: 0 0 8px 0;
+    font-size: 1.05rem;
+}
+.position-card p {
+    margin: 0 0 12px 0;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+/* CV details attributes */
+.attr-row {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-light);
+}
+.attr-row:last-child { border-bottom: none; }
+.attr-label {
+    width: 200px;
+    flex-shrink: 0;
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--text);
+}
+.attr-label .attr-type {
+    font-weight: 400;
+    color: var(--text-light);
+    font-size: 0.78rem;
+}
+.attr-value { flex: 1; }
+
+/* Project card */
+.project-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin-bottom: 12px;
+    transition: var(--transition);
+}
+.project-card:hover { box-shadow: var(--shadow); }
+.project-card h5 { margin: 0 0 4px 0; font-size: 1rem; }
+.project-card .project-period { color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 8px; }
+.project-card .project-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+
+/* Discussion */
+.discussion-container {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+.discussion-messages {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 16px;
+}
+.discussion-input {
+    padding: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+}
+.discussion-input textarea {
+    flex: 1;
+    resize: none;
+}
+
+/* Profile photo */
+.profile-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--border);
+}
+.profile-photo-lg {
+    width: 120px;
+    height: 120px;
+}
+
+/* User avatar small */
+.avatar-sm {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Search results */
+.search-result-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin-bottom: 8px;
+    transition: var(--transition);
+}
+.search-result-item:hover { box-shadow: var(--shadow); }
+.search-result-item h6 { margin: 0 0 4px 0; }
+.search-result-item p { margin: 0; font-size: 0.85rem; color: var(--text-secondary); }
+
+/* Filter bar */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+.filter-bar .form-control,
+.filter-bar .form-select {
+    max-width: 250px;
+}
+
+/* Confirm dialog styles */
+.confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+.confirm-dialog {
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: var(--shadow-lg);
+}
+.confirm-dialog h4 { margin: 0 0 12px; }
+.confirm-dialog p { margin: 0 0 20px; color: var(--text-secondary); font-size: 0.9rem; }
+.confirm-dialog .confirm-actions { display: flex; gap: 8px; justify-content: flex-end; }

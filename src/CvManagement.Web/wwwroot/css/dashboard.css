@@ -1,0 +1,93 @@
+/* Dashboard-specific styles */
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.dashboard-section {
+    margin-bottom: 24px;
+}
+
+.dashboard-section .section-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-section .section-card .list-group {
+    flex: 1;
+}
+
+.position-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-light);
+    transition: var(--transition);
+}
+.position-list-item:last-child { border-bottom: none; }
+.position-list-item:hover { background: var(--bg); }
+.position-list-item .position-title {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--text);
+    text-decoration: none;
+}
+.position-list-item .position-title:hover { color: var(--primary); }
+
+.tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 0;
+}
+.tag-cloud a {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: var(--transition);
+}
+.tag-cloud a:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* Quick actions row */
+.quick-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+.quick-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text);
+    text-decoration: none;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+}
+.quick-action-btn:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-1px);
+}
+.quick-action-btn svg { width: 20px; height: 20px; }

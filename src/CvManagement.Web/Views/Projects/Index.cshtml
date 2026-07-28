@@ -11,37 +11,39 @@
     <div class="alert alert-danger">@error</div>
 }
 
-<div class="toolbar mb-3">
-    <a asp-action="Create" class="btn btn-primary btn-sm">+ @Localizer["+ Create"]</a>
-    <a class="btn btn-warning btn-sm d-none" id="btnEdit">@Localizer["Edit"]</a>
-    <form method="post" asp-action="Delete" class="d-inline" id="deleteForm">
-        <button type="submit" class="btn btn-danger btn-sm d-none" id="btnDelete">@Localizer["Delete"]</button>
-    </form>
-</div>
+<div class="section-card">
+    <div class="toolbar mb-3">
+        <a asp-action="Create" class="btn btn-primary btn-sm">@Localizer["+ Create"]</a>
+        <a class="btn btn-warning btn-sm d-none" id="btnEdit">@Localizer["Edit"]</a>
+        <form method="post" asp-action="Delete" class="d-inline" id="deleteForm">
+            <button type="submit" class="btn btn-danger btn-sm d-none" id="btnDelete">@Localizer["Delete"]</button>
+        </form>
+    </div>
 
-<table class="table table-striped table-hover">
-    <thead>
-        <tr>
-            <th style="width:40px"></th>
-            <th>@Localizer["Name"]</th>
-            <th>@Localizer["Period"]</th>
-            <th>@Localizer["Tags"]</th>
-            <th>@Localizer["Description"]</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+    <table class="table table-striped table-hover mb-0">
+        <thead>
             <tr>
-                <td><input type="checkbox" class="form-check-input row-checkbox" data-id="@item.Id" /></td>
-                <td>@item.Name</td>
-                <td>@item.PeriodDisplay</td>
-                <td>@item.TagsDisplay</td>
-                <td>@item.DescriptionShort</td>
+                <th style="width:40px"></th>
+                <th>@Localizer["Name"]</th>
+                <th>@Localizer["Period"]</th>
+                <th>@Localizer["Tags"]</th>
+                <th>@Localizer["Description"]</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td><input type="checkbox" class="form-check-input row-checkbox" data-id="@item.Id" /></td>
+                    <td>@item.Name</td>
+                    <td>@item.PeriodDisplay</td>
+                    <td>@item.TagsDisplay</td>
+                    <td>@item.DescriptionShort</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 @section Scripts {
     <script>

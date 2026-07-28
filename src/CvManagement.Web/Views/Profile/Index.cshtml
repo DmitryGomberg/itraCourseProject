@@ -17,8 +17,8 @@
 
 <div id="profileContainer" data-version="@Model.Version">
 
-    <div class="mb-4">
-        <h4>@Localizer["Me"]</h4>
+    <div class="section-card mb-4">
+        <div class="section-title">@Localizer["Me"]</div>
         <div class="row g-3">
             <div class="col-md-4">
                 <label class="form-label">@Localizer["First Name"]</label>
@@ -55,10 +55,8 @@
         </div>
     </div>
 
-    <hr />
-
-    <div class="mb-4">
-        <h4>@Localizer["Info"]</h4>
+    <div class="section-card mb-4">
+        <div class="section-title">@Localizer["Info"]</div>
         @foreach (var attr in Model.InfoAttributes)
         {
             <div class="mb-3">

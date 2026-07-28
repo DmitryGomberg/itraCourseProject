@@ -9,51 +9,56 @@
 
 <div class="row">
     <div class="col-md-8">
-        <form asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@Model.Id" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="section-card">
+            <form asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@Model.Id" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-            @if (isEdit)
-            {
-                <input type="hidden" asp-for="Id" />
-                <input type="hidden" asp-for="Version" />
-            }
+                @if (isEdit)
+                {
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="Version" />
+                }
 
-            <div class="mb-3">
-                <label asp-for="Name" class="form-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
 
-            <div class="mb-3">
-                <label asp-for="Description" class="form-label"></label>
-                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label"></label>
+                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
 
-            <div class="mb-3">
-                <label asp-for="Category" class="form-label"></label>
-                <select asp-for="Category" class="form-select"
-                        asp-items="Html.GetEnumSelectList<CvManagement.Domain.AttributeCategory>()"></select>
-                <span asp-validation-for="Category" class="text-danger"></span>
-            </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Category" class="form-label"></label>
+                        <select asp-for="Category" class="form-select"
+                                asp-items="Html.GetEnumSelectList<CvManagement.Domain.AttributeCategory>()"></select>
+                        <span asp-validation-for="Category" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="DataType" class="form-label"></label>
+                        <select asp-for="DataType" class="form-select" id="dataTypeSelect"
+                                asp-items="Html.GetEnumSelectList<CvManagement.Domain.AttributeDataType>()"></select>
+                        <span asp-validation-for="DataType" class="text-danger"></span>
+                    </div>
+                </div>
 
-            <div class="mb-3">
-                <label asp-for="DataType" class="form-label"></label>
-                <select asp-for="DataType" class="form-select" id="dataTypeSelect"
-                        asp-items="Html.GetEnumSelectList<CvManagement.Domain.AttributeDataType>()"></select>
-                <span asp-validation-for="DataType" class="text-danger"></span>
-            </div>
+                <div class="mb-4" id="optionsContainer" style="display:none">
+                    <label class="form-label">@Localizer["Options (one per line)"]</label>
+                    <textarea class="form-control" id="optionsText" rows="5">@string.Join("\n", Model.Options)</textarea>
+                    <span class="text-muted small">@Localizer["Enter each option on a separate line"]</span>
+                </div>
+                <div id="optionsHiddenInputs"></div>
 
-            <div class="mb-3" id="optionsContainer" style="display:none">
-                <label class="form-label">@Localizer["Options (one per line)"]</label>
-                <textarea class="form-control" id="optionsText" rows="5">@string.Join("\n", Model.Options)</textarea>
-                <span class="text-muted small">@Localizer["Enter each option on a separate line"]</span>
-            </div>
-            <div id="optionsHiddenInputs"></div>
-
-            <button type="submit" class="btn btn-primary">@Localizer["Save"]</button>
-            <a asp-action="Index" class="btn btn-secondary">@Localizer["Cancel"]</a>
-        </form>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">@Localizer["Save"]</button>
+                    <a asp-action="Index" class="btn btn-secondary">@Localizer["Cancel"]</a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 

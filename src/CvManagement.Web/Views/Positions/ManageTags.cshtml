@@ -11,45 +11,45 @@
     <div class="alert alert-danger">@error</div>
 }
 
-<h4>@Localizer["Current Tags"]</h4>
+<div class="section-card mb-4">
+    <div class="section-title">@Localizer["Current Tags"]</div>
 
-@if (Model.CurrentTags.Any())
-{
-    <form method="post" asp-action="RemoveTags" asp-route-id="@Model.PositionId" id="removeTagsForm">
-        <div class="d-flex flex-wrap gap-2 mb-3">
-            @foreach (var tag in Model.CurrentTags)
-            {
-                <div class="form-check">
-                    <input class="form-check-input tag-checkbox" type="checkbox" value="@tag.Id" id="tag-@tag.Id" />
-                    <label class="form-check-label badge bg-secondary" for="tag-@tag.Id">@tag.Name</label>
-                </div>
-            }
-        </div>
-        <button type="submit" class="btn btn-danger btn-sm d-none" id="btnRemoveTags">@Localizer["Remove Selected"]</button>
-    </form>
-}
-else
-{
-    <p class="text-muted">@Localizer["No tags assigned."]</p>
-}
-
-<hr />
-
-<h4>@Localizer["Add Tag"]</h4>
-<form method="post" asp-action="AddTags" asp-route-id="@Model.PositionId" class="row g-3 align-items-end">
-    <div class="col-md-6">
-        <label class="form-label">@Localizer["Tag Name (new or existing)"]</label>
-        <input type="text" name="TagName" id="tagNameInput" class="form-control" list="tagSuggestions" placeholder="Type to search or create..." autocomplete="off" />
-        <datalist id="tagSuggestions"></datalist>
-    </div>
-    <div class="col-md-3">
-        <button type="submit" class="btn btn-primary">@Localizer["Add Tag"]</button>
-    </div>
-</form>
-
-<div class="mt-4">
-    <a asp-action="Details" asp-route-id="@Model.PositionId" class="btn btn-secondary">@Localizer["Back to position"]</a>
+    @if (Model.CurrentTags.Any())
+    {
+        <form method="post" asp-action="RemoveTags" asp-route-id="@Model.PositionId" id="removeTagsForm">
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                @foreach (var tag in Model.CurrentTags)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input tag-checkbox" type="checkbox" value="@tag.Id" id="tag-@tag.Id" />
+                        <label class="form-check-label badge bg-secondary" for="tag-@tag.Id">@tag.Name</label>
+                    </div>
+                }
+            </div>
+            <button type="submit" class="btn btn-danger btn-sm d-none" id="btnRemoveTags">@Localizer["Remove Selected"]</button>
+        </form>
+    }
+    else
+    {
+        <p class="text-muted mb-0">@Localizer["No tags assigned."]</p>
+    }
 </div>
+
+<div class="section-card mb-4">
+    <div class="section-title">@Localizer["Add Tag"]</div>
+    <form method="post" asp-action="AddTags" asp-route-id="@Model.PositionId" class="row g-3 align-items-end">
+        <div class="col-md-6">
+            <label class="form-label">@Localizer["Tag Name (new or existing)"]</label>
+            <input type="text" name="TagName" id="tagNameInput" class="form-control" list="tagSuggestions" placeholder="Type to search or create..." autocomplete="off" />
+            <datalist id="tagSuggestions"></datalist>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary">@Localizer["Add Tag"]</button>
+        </div>
+    </form>
+</div>
+
+<a asp-action="Details" asp-route-id="@Model.PositionId" class="btn btn-secondary">@Localizer["Back to position"]</a>
 
 @section Scripts {
     <script>

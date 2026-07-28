@@ -6,32 +6,36 @@
 
 <h2>@Localizer["Manage Attributes"] — @Model.PositionTitle</h2>
 
-<form method="post" asp-action="ManageAttributes" asp-route-id="@Model.PositionId">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th style="width:40px"></th>
-                <th>@Localizer["Name"]</th>
-                <th>@Localizer["Category"]</th>
-                <th>@Localizer["Data Type"]</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var attr in Model.AllAttributes)
-            {
+<div class="section-card">
+    <form method="post" asp-action="ManageAttributes" asp-route-id="@Model.PositionId">
+        <table class="table table-striped table-hover mb-3">
+            <thead>
                 <tr>
-                    <td>
-                        <input type="checkbox" name="selectedAttributeIds" value="@attr.Id"
-                               class="form-check-input" @(attr.IsSelected ? "checked" : "") />
-                    </td>
-                    <td>@attr.Name</td>
-                    <td>@attr.Category</td>
-                    <td>@attr.DataTypeDisplay</td>
+                    <th style="width:40px"></th>
+                    <th>@Localizer["Name"]</th>
+                    <th>@Localizer["Category"]</th>
+                    <th>@Localizer["Data Type"]</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var attr in Model.AllAttributes)
+                {
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="selectedAttributeIds" value="@attr.Id"
+                                   class="form-check-input" @(attr.IsSelected ? "checked" : "") />
+                        </td>
+                        <td>@attr.Name</td>
+                        <td>@attr.Category</td>
+                        <td>@attr.DataTypeDisplay</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
 
-    <button type="submit" class="btn btn-primary">@Localizer["Save"]</button>
-    <a asp-action="Details" asp-route-id="@Model.PositionId" class="btn btn-secondary">@Localizer["Cancel"]</a>
-</form>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">@Localizer["Save"]</button>
+            <a asp-action="Details" asp-route-id="@Model.PositionId" class="btn btn-secondary">@Localizer["Cancel"]</a>
+        </div>
+    </form>
+</div>

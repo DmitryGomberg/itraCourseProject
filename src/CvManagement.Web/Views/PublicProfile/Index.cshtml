@@ -6,8 +6,8 @@
 
 <h2>@Model.FirstName @Model.LastName</h2>
 
-<div class="mb-3">
-    <p><strong>@Localizer["Location:"]</strong> @(string.IsNullOrEmpty(Model.Location) ? "—" : Model.Location)</p>
+<div class="section-card mb-4">
+    <p class="mb-0"><strong>@Localizer["Location:"]</strong> @(string.IsNullOrEmpty(Model.Location) ? "—" : Model.Location)</p>
 </div>
 
 <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">@Localizer["Back"]</a>
